@@ -1,0 +1,110 @@
+<html>
+<head>
+ <link rel="stylesheet" type="text/css" href="css/ionic.css">
+ <script type="text/javascript" src="js/jquery.js"></script>
+ <script type="text/javascript">
+ $(document).ready(function()
+ {
+ $("#insert").click(function(){
+ var title=$("#title").val();
+ var duration=$("#duration").val();
+ var price=$("#price").val();
+ var dataString="title="+title+"&duration="+duration+"&price="+price+"&insert=";
+ if($.trim(title).length>0 & $.trim(duration).length>0 & $.trim(price).length>0)
+ {
+ $.ajax({
+ type: "POST",
+ url:"http://teman.ceuceulaundry.web.id/insert.php",
+ data: dataString,
+ crossDomain: true,
+ cache: false,
+ beforeSend: function(){ $("#insert").val('Connecting...');},
+ success: function(data){
+ if(data=="success")
+ {
+ alert("inserted");
+ $("#insert").val('submit');
+ }
+ else if(data=="error")
+ {
+ alert("error");
+ }
+ }
+ });
+ }return false;
+ });
+ });
+ 
+ function _(el) {
+ return document.getElementById(el);
+ }
+ function uploadfile() {
+ var file =_("file1").files[0];
+ //alert(file.name+" | "+file.size+" | "+file.type);
+ var formdata = new FormData();
+ formdata.append("file1",file);
+ var ajax = new XMLHttpRequest();
+ ajax.upload.addEventListener("progress", progressHandler,false);
+ ajax.addEventListener("load", completeHandler,false);
+ ajax.addEventListener("error", errorHandler,false);
+ ajax.addEventListener("abort",abortHandler,false);
+ ajax.open("POST","http://teman.ceuceulaundry.web.id/upload.php");
+ ajax.send(formdata);
+ 
+ }
+ function progressHandler(event) {
+ 
+ _("loaded_n_total").innerHTML = "Uploaded "+event.loaded+" byte of "+event.total;
+ var percent = (event.loaded / event.total) * 100;
+ _("progressBar").value = Math.round(percent);
+ _("status").innerHTML = Math.round(percent)+"% uploaded... please wait";
+ 
+ }
+  function completeHandler(event) {
+_("status").innerHTML = event.target.responseText;
+ _("progressBar").value = 0;
+ }
+function errorHandler(event) {
+_("status").innerHTML = "error Upload";
+ }
+ function abortHandler(event) {
+_("status").innerHTML = "Upload Aborted";
+ }
+ </script>
+</head>
+<body>
+ <div class="bar bar-header bar-positive" style="margin-bottom:80px;">
+ <h1 class="title">Insert Database</h1>
+ <a class="button button-clear" href="readjson.html">Read JSON</a>
+ </div><br/><br/>
+ <div class="list">
+ <input type="hidden" id="id" value=""/>
+ <div class="item">
+ <label>Title</label>
+ <input type="text" id="title" value=""/>
+ </div>
+ <div class="item">
+ <label>Duration</label>
+ <input type="text" id="duration" value=""/>
+ </div>
+ <div class="item">
+ <label>Price</label>
+ <input type="text" id="price" value=""/>
+ </div>
+ <div class="item">
+ <form method="post" enctype="multipart/form-data" >
+ <label>file</label>
+ <input type="file" name= "file1" id="file1"> <br>
+ <input type="button" value="upload file" onclick="uploadfile()"/>
+ <progress id="progressBar" value="0" max="100" style="widht:300px;" > </progress>
+ <h3 id="status"> </h3>
+ <p id = "loaded_n_total"> </p>
+ 
+ </div>
+ </form>
+ <div class="item">
+ <input type="button" id="insert" class="button button-block" value="Insert"/>
+ </div>
+ </div>
+</body>
+</html>
